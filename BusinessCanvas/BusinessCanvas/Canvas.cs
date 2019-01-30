@@ -32,10 +32,24 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static void OnLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            if (e.NewValue is Layout layout && !layout.IsConfigured)
+            {
+                if (layout.xLength == 0)
+                    throw new System.Configuration.ConfigurationErrorsException($"{nameof(layout.xMin)} or {nameof(layout.xMin)} should be set");
+                if (layout.yLength == 0)
+                    throw new System.Configuration.ConfigurationErrorsException($"{nameof(layout.yMin)} or {nameof(layout.yMin)} should be set");
+            }
             if (d is FrameworkElement fe && !fe.IsInitialized)
             {
-                (e.NewValue as Layout).Parent = fe;
                 fe.Loaded += Fe_Loaded;
+            }
+        }
+
+        private static void CoerceChild(DependencyObject d, DependencyProperty dp, Func<DependencyObject, double> get)
+        {
+            if (!double.IsNaN(get(d)))
+            {
+                d.CoerceValue(dp);
             }
         }
 
@@ -44,34 +58,54 @@ namespace LoLaSoft.Controls.BusinessCanvas
             if (sender is FrameworkElement fe && fe.IsInitialized)
             {
                 fe.Loaded -= Fe_Loaded;
-                //var children = fe.GetChildren().As<FrameworkElement>();
-                Action<DependencyObject, DependencyProperty, Func<DependencyObject, double>> coerceChild = (d, dp, get) =>
+                CoerceChild(fe, XProperty, GetX);
+                CoerceChild(fe, YProperty, GetY);
+                CoerceChild(fe, WProperty, GetW);
+                CoerceChild(fe, HProperty, GetH);
+
+                // init canvas SizeChanged handler
+                if (fe is ItemsControl itemsControl)
                 {
-                    if (!double.IsNaN(get(d)))
-                    {
-                        d.CoerceValue(dp);
-                    }
-                };
-                coerceChild(fe,XProperty, GetX);
-                coerceChild(fe,YProperty, GetY);
-                coerceChild(fe,WProperty, GetW);
-                coerceChild(fe,HProperty, GetH);
-                //Action < DependencyProperty, Func<DependencyObject, double>> coerceChildren = (dp,get) => 
-                //{
-                //    var notNaNchildren = children.Where(d => !double.IsNaN(get(d)));
-                //    foreach (var child in notNaNchildren)
-                //    {
-                //        child.CoerceValue(dp);
-                //    }
-                //};
-                //coerceChildren(XProperty, GetX);
-                //coerceChildren(YProperty, GetY);
-                //coerceChildren(WProperty, GetW);
-                //coerceChildren(HProperty, GetH);
+                    var panel = itemsControl.GetFirstVisualChild<System.Windows.Controls.Panel>();
+                    panel.SizeChanged += Panel_SizeChanged;
+                }
+            }
+        }
+
+        private static void Panel_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var panel = sender as Panel;
+            foreach (var item in panel.GetChildren())
+            {
+                if (e.HeightChanged)
+                {
+                    CoerceChild(item, YProperty, GetY);
+                    CoerceChild(item, HProperty, GetH);
+                }
+                if (e.WidthChanged)
+                {
+                    CoerceChild(item, XProperty, GetX);
+                    CoerceChild(item, WProperty, GetW);
+                }
             }
         }
 
         #endregion
+
+        static System.Windows.Controls.Canvas VerifAndGetCanvas(DependencyObject d)
+        {
+            if (d is FrameworkElement fe && fe.IsInitialized)
+            {
+                var parent = fe.Parent ?? fe.TemplatedParent;
+                if (parent == null) return null;
+                var canvas = parent.GetFirstVisualChild<System.Windows.Controls.Canvas>();
+                return canvas;
+            }
+            else
+            {
+                return null;
+            }
+        }
 
         #region X property
 
@@ -97,13 +131,14 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static object OnXCoerce(DependencyObject d, object baseValue)
         {
-            if (d is FrameworkElement fe && !fe.IsInitialized) return baseValue;
+            var canvas = VerifAndGetCanvas(d);
+            if (canvas == null) return baseValue;
 
             var layout = GetLayout(d);
             var value_to_set = (double)baseValue;
             if (layout != null)
             {
-                value_to_set = layout.Parent.ActualWidth * value_to_set / layout.xMax;
+                value_to_set = canvas.ActualWidth * value_to_set / layout.xLength;
             }
             d.SetValue(System.Windows.Controls.Canvas.LeftProperty, value_to_set);
             return baseValue;
@@ -135,13 +170,14 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static object OnYCoerce(DependencyObject d, object baseValue)
         {
-            if (d is FrameworkElement fe && !fe.IsInitialized) return baseValue;
+            var canvas = VerifAndGetCanvas(d);
+            if (canvas == null) return baseValue;
 
             var layout = GetLayout(d);
             var value_to_set = (double)baseValue;
             if (layout != null)
             {
-                value_to_set = layout.Parent.ActualHeight * value_to_set / layout.yMax;
+                value_to_set = canvas.ActualHeight * value_to_set / layout.yLength;
             }
             d.SetValue(System.Windows.Controls.Canvas.BottomProperty, value_to_set);
             return baseValue;
@@ -173,13 +209,14 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static object OnWCoerce(DependencyObject d, object baseValue)
         {
-            if (d is FrameworkElement fe && !fe.IsInitialized) return baseValue;
+            var canvas = VerifAndGetCanvas(d);
+            if (canvas == null) return baseValue;
 
             var layout = GetLayout(d);
             var value_to_set = (double)baseValue;
             if (layout != null)
             {
-                value_to_set = layout.Parent.ActualWidth * value_to_set / layout.xMax;
+                value_to_set = canvas.ActualWidth * value_to_set / layout.xLength;
             }
             d.SetValue(System.Windows.FrameworkElement.WidthProperty, value_to_set);
             return baseValue;
@@ -211,13 +248,14 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static object OnHCoerce(DependencyObject d, object baseValue)
         {
-            if (d is FrameworkElement fe && !fe.IsInitialized) return baseValue;
+            var canvas = VerifAndGetCanvas(d);
+            if (canvas == null) return baseValue;
 
             var layout = GetLayout(d);
             var value_to_set = (double)baseValue;
             if (layout != null)
             {
-                value_to_set = layout.Parent.ActualHeight * value_to_set / layout.yMax;
+                value_to_set = canvas.ActualHeight * value_to_set / layout.yLength;
             }
             d.SetValue(System.Windows.FrameworkElement.HeightProperty, value_to_set);
             return baseValue;

@@ -9,7 +9,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid >
         <Grid.Resources>
-            <bc:Layout x:Key="layout" xMax="8" yMax="8" />
+            <bc:Layout x:Key="layout" xMin="-8" xMax="8" yMax="8" />
             <local:Class1 x:Key="first" x="1" y="1" w="2" h="6" />
             <local:Class1 x:Key="second" x="3" y="1" w="2" h="6" />
             <local:Class1 x:Key="third" x="5" y="1" w="2" h="6" />

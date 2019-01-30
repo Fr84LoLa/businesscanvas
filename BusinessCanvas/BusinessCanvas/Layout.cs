@@ -7,12 +7,79 @@ using System.Windows;
 
 namespace LoLaSoft.Controls.BusinessCanvas
 {
+    /// <summary>
+    /// Represents the business layout containing min and max properties of business referential
+    /// </summary>
     public class Layout : DependencyObject
     {
-        internal FrameworkElement Parent { get; set; }
+        #region xMin
+
+        /// <summary>
+        /// Represents the maximum value on X axis
+        /// </summary>
+        public double xMin
+        {
+            get { return (double)GetValue(xMinProperty); }
+            set { SetValue(xMinProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for xMin.  This enables animation, styling, binding, etc...
+
+        /// <summary>
+        /// Property representing the maximum value on X axis
+        /// </summary>
+        public static readonly DependencyProperty xMinProperty =
+            DependencyProperty.Register("xMin", typeof(double), typeof(Layout),
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnxMinChanged), new CoerceValueCallback(OnxMinCoerce)));
+
+        private static void OnxMinChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            d.CoerceValue(e.Property);
+        }
+
+        private static object OnxMinCoerce(DependencyObject d, object baseValue)
+        {
+            return baseValue;
+        }
+
+        #endregion
+
+        #region yMin
+
+        /// <summary>
+        /// Represents the maximum value on Y axis
+        /// </summary>
+        public double yMin
+        {
+            get { return (double)GetValue(yMinProperty); }
+            set { SetValue(yMinProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for yMin.  This enables animation, styling, binding, etc...
+        /// <summary>
+        /// Property representing the maximum value on Y axis
+        /// </summary>
+        public static readonly DependencyProperty yMinProperty =
+            DependencyProperty.Register("yMin", typeof(double), typeof(Layout),
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnyMinChanged), new CoerceValueCallback(OnyMinCoerce)));
+
+        private static void OnyMinChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            d.CoerceValue(e.Property);
+        }
+
+        private static object OnyMinCoerce(DependencyObject d, object baseValue)
+        {
+            return baseValue;
+        }
+
+        #endregion
 
         #region xMax
 
+        /// <summary>
+        /// Represents the maximum value on X axis
+        /// </summary>
         public double xMax
         {
             get { return (double)GetValue(xMaxProperty); }
@@ -20,6 +87,10 @@ namespace LoLaSoft.Controls.BusinessCanvas
         }
 
         // Using a DependencyProperty as the backing store for xMax.  This enables animation, styling, binding, etc...
+
+        /// <summary>
+        /// Property representing the maximum value on X axis
+        /// </summary>
         public static readonly DependencyProperty xMaxProperty =
             DependencyProperty.Register("xMax", typeof(double), typeof(Layout),
                 new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnxMaxChanged), new CoerceValueCallback(OnxMaxCoerce)));
@@ -38,6 +109,9 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         #region yMax
 
+        /// <summary>
+        /// Represents the maximum value on Y axis
+        /// </summary>
         public double yMax
         {
             get { return (double)GetValue(yMaxProperty); }
@@ -45,6 +119,9 @@ namespace LoLaSoft.Controls.BusinessCanvas
         }
 
         // Using a DependencyProperty as the backing store for yMax.  This enables animation, styling, binding, etc...
+        /// <summary>
+        /// Property representing the maximum value on Y axis
+        /// </summary>
         public static readonly DependencyProperty yMaxProperty =
             DependencyProperty.Register("yMax", typeof(double), typeof(Layout),
                 new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnyMaxChanged), new CoerceValueCallback(OnyMaxCoerce)));
@@ -61,5 +138,32 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         #endregion
 
+        #region Public properties
+
+        /// <summary>
+        /// Represents the business distance between min and max on X axis
+        /// </summary>
+        public double xLength
+        {
+            get { return xMax - xMin; }
+        }
+
+        /// <summary>
+        /// Represents the business distance between min and max on Y axis
+        /// </summary>
+        public double yLength
+        {
+            get { return yMax - yMin; }
+        }
+
+        /// <summary>
+        /// Determines if layout is correctly configured (X and Y length different from zero)
+        /// </summary>
+        public bool IsConfigured
+        {
+            get { return xLength != 0 && yLength != 0; }
+        }
+
+        #endregion
     }
 }
