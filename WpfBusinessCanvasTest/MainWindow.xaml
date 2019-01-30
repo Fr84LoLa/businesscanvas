@@ -9,29 +9,31 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid >
         <Grid.Resources>
-            <bc:Layout x:Key="layout" xMin="-8" xMax="8" yMax="8" />
-            <local:Class1 x:Key="first" x="1" y="1" w="2" h="6" />
-            <local:Class1 x:Key="second" x="3" y="1" w="2" h="6" />
-            <local:Class1 x:Key="third" x="5" y="1" w="2" h="6" />
+            <bc:Layout x:Key="layout" xMin="-1" xMax="7" yMin="-1" yMax="7" />
+            <local:Class1 x:Key="first" x="0" y="0" w="2" h="6" />
+            <local:Class1 x:Key="second" x="2" y="0" w="2" h="6" />
+            <local:Class1 x:Key="third" x="4" y="0" w="2" h="6" />
         </Grid.Resources>
-        <Border BorderThickness="1" BorderBrush="Blue" Background="AliceBlue"
-                bc:Canvas.Layout="{StaticResource layout}" >
-            <ItemsControl >
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas IsItemsHost="True" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <Border Background="Blue" DataContext="{StaticResource first}"
+        <Grid>
+            <!--<Canvas bc:Canvas.Layout="{StaticResource layout}" />-->
+            <Border BorderThickness="1" BorderBrush="Blue" Background="AliceBlue" >
+                <ItemsControl bc:Canvas.Layout="{StaticResource layout}" >
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <Border Background="Blue" DataContext="{StaticResource first}"
                         bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
                         bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
-                <Border Background="White" DataContext="{StaticResource second}"
+                    <Border Background="White" DataContext="{StaticResource second}"
                         bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
                         bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
-                <Border Background="Red" DataContext="{StaticResource third}"
+                    <Border Background="Red" DataContext="{StaticResource third}"
                         bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
                         bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
-            </ItemsControl>
-        </Border>
+                </ItemsControl>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

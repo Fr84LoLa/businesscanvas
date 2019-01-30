@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
+using SysWinCtrls = System.Windows.Controls;
 using System.Windows.Media;
 
 namespace LoLaSoft.Controls.BusinessCanvas
@@ -13,6 +13,76 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
     public class Canvas
     {
+        #region Private static methods
+
+        private static void CoerceChild(DependencyObject d, DependencyProperty dp, Func<DependencyObject, double> get)
+        {
+            if (!double.IsNaN(get(d)))
+            {
+                d.CoerceValue(dp);
+            }
+        }
+
+        private static void Fe_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement fe && fe.IsInitialized)
+            {
+                fe.Loaded -= Fe_Loaded;
+
+                CoerceChild(fe, XProperty, GetX);
+                CoerceChild(fe, YProperty, GetY);
+                CoerceChild(fe, WProperty, GetW);
+                CoerceChild(fe, HProperty, GetH);
+
+                var layout = GetLayout(fe);
+                var itemscontrol = SysWinCtrls.ItemsControl.ItemsControlFromItemContainer(fe);
+            }
+        }
+
+        private static void ItemsControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var control = sender as DependencyObject;
+            foreach (var item in control.GetChildren())
+            {
+                if (e.HeightChanged)
+                {
+                    CoerceChild(item, YProperty, GetY);
+                    CoerceChild(item, HProperty, GetH);
+                }
+                if (e.WidthChanged)
+                {
+                    CoerceChild(item, XProperty, GetX);
+                    CoerceChild(item, WProperty, GetW);
+                }
+            }
+        }
+
+        private static bool VerifAndRetrieve(DependencyObject d, out SysWinCtrls.Canvas canvas, out Layout layout)
+        {
+            layout = null;
+            canvas = null;
+
+            if (d is FrameworkElement fe && fe.IsInitialized)
+            {
+                var parent = fe.Parent ?? fe.TemplatedParent;
+                if (parent == null) return false;
+                canvas = parent.GetFirstVisualChild<SysWinCtrls.Canvas>();
+            }
+
+            var itemscontrol = SysWinCtrls.ItemsControl.ItemsControlFromItemContainer(d);
+            if (itemscontrol != null)
+            {
+                layout = GetLayout(itemscontrol);
+                return (layout != null && canvas != null);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        #endregion
+
         #region Layout property
 
         public static Layout GetLayout(DependencyObject obj)
@@ -28,84 +98,55 @@ namespace LoLaSoft.Controls.BusinessCanvas
         // Using a DependencyProperty as the backing store for Layout.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty LayoutProperty =
             DependencyProperty.RegisterAttached("Layout", typeof(Layout), typeof(Canvas),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits, new PropertyChangedCallback(OnLayoutChanged)));
+                new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnLayoutChanged)));
 
         private static void OnLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (e.NewValue is Layout layout && !layout.IsConfigured)
+            if (e.NewValue is Layout layout)
             {
-                if (layout.xLength == 0)
-                    throw new System.Configuration.ConfigurationErrorsException($"{nameof(layout.xMin)} or {nameof(layout.xMin)} should be set");
-                if (layout.yLength == 0)
-                    throw new System.Configuration.ConfigurationErrorsException($"{nameof(layout.yMin)} or {nameof(layout.yMin)} should be set");
-            }
-            if (d is FrameworkElement fe && !fe.IsInitialized)
-            {
-                fe.Loaded += Fe_Loaded;
-            }
-        }
-
-        private static void CoerceChild(DependencyObject d, DependencyProperty dp, Func<DependencyObject, double> get)
-        {
-            if (!double.IsNaN(get(d)))
-            {
-                d.CoerceValue(dp);
-            }
-        }
-
-        private static void Fe_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is FrameworkElement fe && fe.IsInitialized)
-            {
-                fe.Loaded -= Fe_Loaded;
-                CoerceChild(fe, XProperty, GetX);
-                CoerceChild(fe, YProperty, GetY);
-                CoerceChild(fe, WProperty, GetW);
-                CoerceChild(fe, HProperty, GetH);
-
-                // init canvas SizeChanged handler
-                if (fe is ItemsControl itemsControl)
+                // 1st, verify that layout is set on an ItemsControl 
+                if (d is SysWinCtrls.ItemsControl itemscontrol)
                 {
-                    var panel = itemsControl.GetFirstVisualChild<System.Windows.Controls.Panel>();
-                    panel.SizeChanged += Panel_SizeChanged;
+                    itemscontrol.SizeChanged += ItemsControl_SizeChanged;
+                    itemscontrol.Loaded += (s,ea) => {
+                        var canvas = (s as SysWinCtrls.ItemsControl).GetFirstVisualChild<SysWinCtrls.Canvas>();
+                        if (canvas == null)
+                        {
+                            throw new InvalidOperationException("ItemsControl must have a Canvas as ItemsTemplate");
+                        }
+                    };
+                    itemscontrol.Unloaded += (s, ea) => {
+                        (s as SysWinCtrls.ItemsControl).Unloaded -= Itemscontrol_Unloaded;
+                        (s as SysWinCtrls.ItemsControl).SizeChanged -= ItemsControl_SizeChanged;
+                    };
+
+                    // 2nd, verify that layout is correctly configured
+                    if (!layout.IsConfigured)
+                    {
+                        if (layout.xLength == 0)
+                            throw new System.Configuration.ConfigurationErrorsException($"{nameof(layout.xMin)} or {nameof(layout.xMin)} should be set");
+                        if (layout.yLength == 0)
+                            throw new System.Configuration.ConfigurationErrorsException($"{nameof(layout.yMin)} or {nameof(layout.yMin)} should be set");
+
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException("Layout property can only be set on a ItemsControl");
                 }
             }
         }
 
-        private static void Panel_SizeChanged(object sender, SizeChangedEventArgs e)
+        private static void Itemscontrol_Unloaded(object sender, RoutedEventArgs e)
         {
-            var panel = sender as Panel;
-            foreach (var item in panel.GetChildren())
-            {
-                if (e.HeightChanged)
-                {
-                    CoerceChild(item, YProperty, GetY);
-                    CoerceChild(item, HProperty, GetH);
-                }
-                if (e.WidthChanged)
-                {
-                    CoerceChild(item, XProperty, GetX);
-                    CoerceChild(item, WProperty, GetW);
-                }
-            }
+        }
+
+        private static void Itemscontrol_Initialized(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
-
-        static System.Windows.Controls.Canvas VerifAndGetCanvas(DependencyObject d)
-        {
-            if (d is FrameworkElement fe && fe.IsInitialized)
-            {
-                var parent = fe.Parent ?? fe.TemplatedParent;
-                if (parent == null) return null;
-                var canvas = parent.GetFirstVisualChild<System.Windows.Controls.Canvas>();
-                return canvas;
-            }
-            else
-            {
-                return null;
-            }
-        }
 
         #region X property
 
@@ -131,16 +172,17 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static object OnXCoerce(DependencyObject d, object baseValue)
         {
-            var canvas = VerifAndGetCanvas(d);
-            if (canvas == null) return baseValue;
+            SysWinCtrls.Canvas canvas; Layout layout;
+            if (!VerifAndRetrieve(d, out canvas, out layout)) return baseValue;
 
-            var layout = GetLayout(d);
             var value_to_set = (double)baseValue;
-            if (layout != null)
-            {
-                value_to_set = canvas.ActualWidth * value_to_set / layout.xLength;
-            }
-            d.SetValue(System.Windows.Controls.Canvas.LeftProperty, value_to_set);
+
+            var ratio = canvas.ActualWidth / layout.xLength;
+
+            value_to_set = (value_to_set - layout.xMin) * ratio;
+
+            d.SetValue(SysWinCtrls.Canvas.LeftProperty, value_to_set);
+
             return baseValue;
         }
 
@@ -170,16 +212,17 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static object OnYCoerce(DependencyObject d, object baseValue)
         {
-            var canvas = VerifAndGetCanvas(d);
-            if (canvas == null) return baseValue;
+            SysWinCtrls.Canvas canvas; Layout layout;
+            if (!VerifAndRetrieve(d, out canvas, out layout)) return baseValue;
 
-            var layout = GetLayout(d);
             var value_to_set = (double)baseValue;
-            if (layout != null)
-            {
-                value_to_set = canvas.ActualHeight * value_to_set / layout.yLength;
-            }
-            d.SetValue(System.Windows.Controls.Canvas.BottomProperty, value_to_set);
+
+            var ratio = canvas.ActualHeight / layout.yLength;
+
+            value_to_set = (value_to_set - layout.yMin) * ratio;
+
+            d.SetValue(SysWinCtrls.Canvas.BottomProperty, value_to_set);
+
             return baseValue;
         }
 
@@ -209,16 +252,15 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static object OnWCoerce(DependencyObject d, object baseValue)
         {
-            var canvas = VerifAndGetCanvas(d);
-            if (canvas == null) return baseValue;
+            SysWinCtrls.Canvas canvas; Layout layout;
+            if (!VerifAndRetrieve(d, out canvas, out layout)) return baseValue;
 
-            var layout = GetLayout(d);
             var value_to_set = (double)baseValue;
-            if (layout != null)
-            {
-                value_to_set = canvas.ActualWidth * value_to_set / layout.xLength;
-            }
+
+            value_to_set = canvas.ActualWidth * value_to_set / layout.xLength;
+
             d.SetValue(System.Windows.FrameworkElement.WidthProperty, value_to_set);
+
             return baseValue;
         }
 
@@ -248,15 +290,13 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static object OnHCoerce(DependencyObject d, object baseValue)
         {
-            var canvas = VerifAndGetCanvas(d);
-            if (canvas == null) return baseValue;
+            SysWinCtrls.Canvas canvas; Layout layout;
+            if (!VerifAndRetrieve(d, out canvas, out layout)) return baseValue;
 
-            var layout = GetLayout(d);
             var value_to_set = (double)baseValue;
-            if (layout != null)
-            {
-                value_to_set = canvas.ActualHeight * value_to_set / layout.yLength;
-            }
+
+            value_to_set = canvas.ActualHeight * value_to_set / layout.yLength;
+
             d.SetValue(System.Windows.FrameworkElement.HeightProperty, value_to_set);
             return baseValue;
         }
