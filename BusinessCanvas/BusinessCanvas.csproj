@@ -50,11 +50,6 @@
     <Compile Include="BusinessCanvas\Layout.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Extensions\Extensions.csproj">
-      <Project>{7942261a-cb01-47ad-8621-8d1611b2f791}</Project>
-      <Name>Extensions</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <Import Project="..\Extensions\Extensions.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
