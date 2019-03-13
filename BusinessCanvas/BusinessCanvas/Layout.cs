@@ -161,7 +161,14 @@ namespace LoLaSoft.Controls.BusinessCanvas
         /// </summary>
         public bool IsConfigured
         {
-            get { return xLength != 0 && yLength != 0; }
+            get
+            {
+                if (xLength == 0)
+                    throw new System.Configuration.ConfigurationErrorsException($"{nameof(xMin)} or {nameof(xMax)} should be set");
+                if (yLength == 0)
+                    throw new System.Configuration.ConfigurationErrorsException($"{nameof(yMin)} or {nameof(yMax)} should be set");
+                return xLength != 0 && yLength != 0;
+            }
         }
 
         #endregion

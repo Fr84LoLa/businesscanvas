@@ -73,7 +73,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
             if (itemscontrol != null)
             {
                 layout = GetLayout(itemscontrol);
-                return (layout != null && canvas != null);
+                return (canvas != null && layout != null && layout.IsConfigured);
             }
             else
             {
@@ -119,16 +119,6 @@ namespace LoLaSoft.Controls.BusinessCanvas
                         (s as SysWinCtrls.ItemsControl).Unloaded -= Itemscontrol_Unloaded;
                         (s as SysWinCtrls.ItemsControl).SizeChanged -= ItemsControl_SizeChanged;
                     };
-
-                    // 2nd, verify that layout is correctly configured
-                    if (!layout.IsConfigured)
-                    {
-                        if (layout.xLength == 0)
-                            throw new System.Configuration.ConfigurationErrorsException($"{nameof(layout.xMin)} or {nameof(layout.xMin)} should be set");
-                        if (layout.yLength == 0)
-                            throw new System.Configuration.ConfigurationErrorsException($"{nameof(layout.yMin)} or {nameof(layout.yMin)} should be set");
-
-                    }
                 }
                 else
                 {
@@ -257,7 +247,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
             var value_to_set = (double)baseValue;
 
-            value_to_set = canvas.ActualWidth * value_to_set / layout.xLength;
+            value_to_set = Math.Abs(canvas.ActualWidth * value_to_set / layout.xLength);
 
             d.SetValue(System.Windows.FrameworkElement.WidthProperty, value_to_set);
 
@@ -295,7 +285,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
             var value_to_set = (double)baseValue;
 
-            value_to_set = canvas.ActualHeight * value_to_set / layout.yLength;
+            value_to_set = Math.Abs(canvas.ActualHeight * value_to_set / layout.yLength);
 
             d.SetValue(System.Windows.FrameworkElement.HeightProperty, value_to_set);
             return baseValue;
