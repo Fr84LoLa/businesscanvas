@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,7 +35,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static void OnxMinChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            d.CoerceValue(e.Property);
+            Helpers.DebugWriteOrTrace(e);
         }
 
         private static object OnxMinCoerce(DependencyObject d, object baseValue)
@@ -65,7 +66,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static void OnyMinChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            d.CoerceValue(e.Property);
+            Helpers.DebugWriteOrTrace(e);
         }
 
         private static object OnyMinCoerce(DependencyObject d, object baseValue)
@@ -93,11 +94,11 @@ namespace LoLaSoft.Controls.BusinessCanvas
         /// </summary>
         public static readonly DependencyProperty xMaxProperty =
             DependencyProperty.Register("xMax", typeof(double), typeof(Layout),
-                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnxMaxChanged), new CoerceValueCallback(OnxMaxCoerce)));
+                new FrameworkPropertyMetadata(1d, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnxMaxChanged), new CoerceValueCallback(OnxMaxCoerce)));
 
         private static void OnxMaxChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            d.CoerceValue(e.Property);
+            Helpers.DebugWriteOrTrace(e);
         }
 
         private static object OnxMaxCoerce(DependencyObject d, object baseValue)
@@ -128,7 +129,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static void OnyMaxChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            d.CoerceValue(e.Property);
+            Helpers.DebugWriteOrTrace(e);
         }
 
         private static object OnyMaxCoerce(DependencyObject d, object baseValue)

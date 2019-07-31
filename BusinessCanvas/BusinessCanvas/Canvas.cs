@@ -10,6 +10,7 @@ using System.Windows.Media;
 namespace LoLaSoft.Controls.BusinessCanvas
 {
     using LoLaSoft.Extensions;
+    using System.Diagnostics;
 
     public class Canvas
     {
@@ -112,7 +113,9 @@ namespace LoLaSoft.Controls.BusinessCanvas
                         var canvas = (s as SysWinCtrls.ItemsControl).GetFirstVisualChild<SysWinCtrls.Canvas>();
                         if (canvas == null)
                         {
-                            throw new InvalidOperationException("ItemsControl must have a Canvas as ItemsTemplate");
+                            var message = "ItemsControl must have a Canvas as ItemsTemplate to work properly";
+                            Trace.TraceError(message);
+                            throw new InvalidOperationException(message);
                         }
                     };
                     itemscontrol.Unloaded += (s, ea) => {
@@ -157,7 +160,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static void OnXChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            d.CoerceValue(e.Property);
+            Helpers.DebugWriteOrTrace(e);
         }
 
         private static object OnXCoerce(DependencyObject d, object baseValue)
@@ -197,7 +200,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static void OnYChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            d.CoerceValue(e.Property);
+            Helpers.DebugWriteOrTrace(e);
         }
 
         private static object OnYCoerce(DependencyObject d, object baseValue)
@@ -237,7 +240,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static void OnWChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            d.CoerceValue(e.Property);
+            Helpers.DebugWriteOrTrace(e);
         }
 
         private static object OnWCoerce(DependencyObject d, object baseValue)
@@ -275,7 +278,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
 
         private static void OnHChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            d.CoerceValue(e.Property);
+            Helpers.DebugWriteOrTrace(e);
         }
 
         private static object OnHCoerce(DependencyObject d, object baseValue)

@@ -7,33 +7,49 @@
         xmlns:bc="http://lolasoft.net/BusinessCanvas"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid >
-        <Grid.Resources>
-            <bc:Layout x:Key="layout" xMin="-1" xMax="7" yMin="-1" yMax="7" />
-            <local:Class1 x:Key="first" x="0" y="0" w="2" h="6" />
-            <local:Class1 x:Key="second" x="2" y="0" w="2" h="6" />
-            <local:Class1 x:Key="third" x="4" y="0" w="2" h="6" />
-        </Grid.Resources>
-        <Grid>
-            <!--<Canvas bc:Canvas.Layout="{StaticResource layout}" />-->
-            <Border BorderThickness="1" BorderBrush="Blue" Background="AliceBlue" >
-                <ItemsControl bc:Canvas.Layout="{StaticResource layout}" >
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <Canvas />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <Border Background="Blue" DataContext="{StaticResource first}"
+    <TabControl>
+        <TabItem Header="French flag">
+            <DockPanel>
+                <Label Content="Static demonstration of FrameworkElements directly defined inside an ItemsControl" DockPanel.Dock="Top" />
+                <Grid >
+                    <Grid.Resources>
+                        <bc:Layout x:Key="layout" xMin="-1" xMax="7" yMin="-1" yMax="7" />
+                        <local:Class1 x:Key="first" x="0" y="0" w="2" h="6" />
+                        <local:Class1 x:Key="second" x="2" y="0" w="2" h="6" />
+                        <local:Class1 x:Key="third" x="4" y="0" w="2" h="6" />
+                    </Grid.Resources>
+                    <Grid>
+                        <!--<Canvas bc:Canvas.Layout="{StaticResource layout}" />-->
+                        <Border BorderThickness="1" BorderBrush="Blue" Background="AliceBlue" >
+                            <ItemsControl bc:Canvas.Layout="{StaticResource layout}" >
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <TextBlock Text="-1,-1" bc:Canvas.X="-0.95" bc:Canvas.Y="-0.95" />
+                                <TextBlock Text="+7,+7" bc:Canvas.X="6.6" bc:Canvas.Y="6.5" />
+                                <TextBlock Text="0,0" bc:Canvas.X="0.05" bc:Canvas.Y="0.05" Foreground="White" Panel.ZIndex="1" />
+                                <Border BorderThickness="0,0,1,0" BorderBrush="Green" Background="Transparent" Width="20" Panel.ZIndex="1" 
+                                        bc:Canvas.H="{Binding Source={StaticResource second}, Path=h}"
+                                        bc:Canvas.X="{Binding Source={StaticResource second}, Path=x}"
+                                        bc:Canvas.Y="{Binding Source={StaticResource second}, Path=y}">
+                                    <TextBlock Text="{Binding Source={StaticResource second}, Path=h}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <Border Background="Blue" DataContext="{StaticResource first}"
                         bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
                         bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
-                    <Border Background="White" DataContext="{StaticResource second}"
+                                <Border Background="White" DataContext="{StaticResource second}"
                         bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
                         bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
-                    <Border Background="Red" DataContext="{StaticResource third}"
+                                <Border Background="Red" DataContext="{StaticResource third}"
                         bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
                         bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
-                </ItemsControl>
-            </Border>
-        </Grid>
-    </Grid>
+                            </ItemsControl>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </DockPanel>
+        </TabItem>
+    </TabControl>
 </Window>
