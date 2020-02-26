@@ -8,12 +8,12 @@ using System.Windows.Media;
 
 namespace LoLaSoft.Extensions
 {
-    public static class DependencyObjectExtensions
+    internal static class DependencyObjectExtensions
     {
         /// <summary>
         /// function to retrieve in visual tree the first child of type T
         /// </summary>
-        public static T GetFirstVisualChild<T>(this DependencyObject parent) 
+        internal static T GetFirstVisualChild<T>(this DependencyObject parent) 
             where T : Visual
         {
             T child = default(T);
@@ -35,18 +35,35 @@ namespace LoLaSoft.Extensions
             return child;
         }
         /// <summary>
-        /// function to retrieve in visual tree all children
+        /// function to recusurvely retrieve in visual tree all children
         /// </summary>
-        public static IEnumerable<DependencyObject> GetChildren(this DependencyObject obj) 
+        internal static IEnumerable<DependencyObject> GetImmediateChildren(this DependencyObject obj) 
+        {
+            return obj.GetChildren(false);
+        }
+        /// <summary>
+        /// function to recusurvely retrieve in visual tree all children
+        /// </summary>
+        internal static IEnumerable<DependencyObject> GetRecursiveChildren(this DependencyObject obj)
+        {
+            return obj.GetChildren(true);
+        }
+        /// <summary>
+        /// function to retrieve in visual tree children with option recursive ou immediate
+        /// </summary>
+        private static IEnumerable<DependencyObject> GetChildren(this DependencyObject obj, bool recursive)
         {
             int childrencount = VisualTreeHelper.GetChildrenCount(obj);
             for (int i = 0; i < childrencount; i++)
             {
                 var v = VisualTreeHelper.GetChild(obj, i);
                 yield return v;
-                foreach (var child in GetChildren(v))
+                if (recursive)
                 {
-                    yield return child;
+                    foreach (var child in GetRecursiveChildren(v))
+                    {
+                        yield return child;
+                    }
                 }
             }
         }
@@ -56,7 +73,7 @@ namespace LoLaSoft.Extensions
         /// <typeparam name="T">Type inheriting from DependencyObject</typeparam>
         /// <param name="objects">an enumeration of Dependency Objects</param>
         /// <returns>an enumeration of T inheriting from DependencyObject</returns>
-        public static IEnumerable<DependencyObject> As<T>(this IEnumerable<DependencyObject> objects)
+        internal static IEnumerable<DependencyObject> As<T>(this IEnumerable<DependencyObject> objects)
             where T : DependencyObject
         {
             return objects.OfType<T>();

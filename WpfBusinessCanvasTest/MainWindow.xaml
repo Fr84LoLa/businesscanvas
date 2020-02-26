@@ -37,14 +37,14 @@
                                     <TextBlock Text="{Binding Source={StaticResource second}, Path=h}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Border>
                                 <Border Background="Blue" DataContext="{StaticResource first}"
-                        bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
-                        bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
+                                    bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
+                                    bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
                                 <Border Background="White" DataContext="{StaticResource second}"
-                        bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
-                        bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
+                                    bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
+                                    bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
                                 <Border Background="Red" DataContext="{StaticResource third}"
-                        bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
-                        bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
+                                    bc:Canvas.X="{Binding x}" bc:Canvas.Y="{Binding y}"
+                                    bc:Canvas.W="{Binding w}" bc:Canvas.H="{Binding h}" />
                             </ItemsControl>
                         </Border>
                     </Grid>

@@ -144,7 +144,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
         /// <summary>
         /// Represents the business distance between min and max on X axis
         /// </summary>
-        public double xLength
+        internal double xLength
         {
             get { return xMax - xMin; }
         }
@@ -152,7 +152,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
         /// <summary>
         /// Represents the business distance between min and max on Y axis
         /// </summary>
-        public double yLength
+        internal double yLength
         {
             get { return yMax - yMin; }
         }
@@ -160,7 +160,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
         /// <summary>
         /// Determines if layout is correctly configured (X and Y length different from zero)
         /// </summary>
-        public bool IsConfigured
+        internal bool IsConfigured
         {
             get
             {

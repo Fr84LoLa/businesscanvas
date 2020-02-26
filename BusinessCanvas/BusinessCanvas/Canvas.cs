@@ -43,7 +43,7 @@ namespace LoLaSoft.Controls.BusinessCanvas
         private static void ItemsControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             var control = sender as DependencyObject;
-            foreach (var item in control.GetChildren())
+            foreach (var item in control.GetRecursiveChildren())
             {
                 if (e.HeightChanged)
                 {
